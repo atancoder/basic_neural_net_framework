@@ -25,7 +25,7 @@ ACTIVATION_FN_PRIME = {relu: relu_prime, sigmoid: sigmoid_prime}
 
 class Layer:
     def __init__(
-        self, units: int, activation_fn: str, learning_rate: float = 1
+        self, units: int, activation_fn: str, learning_rate: float = 0.1
     ) -> None:
         self.units = units
         self.learning_rate = learning_rate

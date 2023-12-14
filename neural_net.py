@@ -41,7 +41,11 @@ class NeuralNetwork:
             last_layer = self.layers[-1].id
             return layer_outputs[last_layer]["output"]
 
-    def train(self, X, Y, iterations=10):
+    def print_weights(self):
+        for layer in self.layers:
+            print(f"Layer {layer.id}: W = {layer.W}. b = {layer.b}")
+
+    def train(self, X, Y, iterations=100):
         for _ in range(iterations):
             self.apply_backprop(X, Y)
 
