@@ -40,8 +40,8 @@ def relu_neural_net(training_data, training_labels):
         optimizer=Adam(learning_rate=0.01),
     )
     model.fit(training_data, training_labels, epochs=100)
-    Y_hat = model.predict(training_data)
-    num_correct = (training_labels == predict_with_threshold(Y_hat)).sum()
+    probabilities = model.predict(training_data)
+    num_correct = (training_labels == predict_with_threshold(probabilities)).sum()
     print(f"Accuracy: {num_correct / training_data.shape[0]}")
     print_weights(model)
 

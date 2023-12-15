@@ -65,6 +65,8 @@ def regression():
 
 def tensor_flow():
     X, Y = generate_train_data_classification(samples=10000)
+    X, Y = make_moons(n_samples=30, noise=0.3, random_state=1)
+    X = X.T
     relu_neural_net(X, Y)
 
 
