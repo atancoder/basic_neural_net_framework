@@ -6,7 +6,9 @@ from sklearn.datasets import make_moons
 from layers import Layer
 from loss_functions import MSE, BinaryCrossEntropyLoss
 from neural_net import NeuralNetwork
-from tensor_flow import relu_neural_net
+from tensor_flow import neural_net
+
+np.set_printoptions(threshold=10)
 
 
 def in_range(x, y) -> bool:
@@ -63,23 +65,23 @@ def regression():
     print(f"Loss after training: {loss}")
 
 
-def tensor_flow():
-    X, Y = generate_train_data_classification(samples=10000)
-    X, Y = make_moons(n_samples=30, noise=0.3, random_state=1)
-    X = X.T
-    relu_neural_net(X, Y)
+def tensor_flow(X, Y, iterations=1000):
+    neural_net(X, Y, iterations)
 
 
-def classification():
-    X, Y = generate_train_data_classification(samples=10000)
-    # layers = [Layer(3, "relu"), Layer(2, "relu"), Layer(1, "sigmoid")]
-    # layers = [Layer(2, "relu"), Layer(1, "sigmoid")]
-    layers = [Layer(1, "sigmoid")]
+def classification(X, Y, iterations=1000):
+    layers = [
+        Layer(16, "relu"),
+        Layer(8, "relu"),
+        Layer(4, "relu"),
+        Layer(2, "relu"),
+        Layer(1, "sigmoid"),
+    ]
     nn = NeuralNetwork(
         2,
         layers,
         loss_cls=BinaryCrossEntropyLoss(C=0.01, regularization=False),
-        learning_rate=0.01,
+        learning_rate=0.005,
         dynamic_lr=False,
     )
     nn.score(X, Y)
@@ -87,7 +89,7 @@ def classification():
     loss = nn.compute_loss(Y_hat, Y)
     print(f"Loss before training: {loss}")
 
-    nn.train(X, Y, iterations=1000)
+    nn.train(X, Y, iterations)
     nn.print_weights()
     nn.score(X, Y)
     Y_hat = nn.predict(X)
@@ -96,7 +98,10 @@ def classification():
 
 
 def main():
-    tensor_flow()
+    X, Y = generate_train_data_classification(samples=10000)
+    X, Y = make_moons(n_samples=30, noise=0.3, random_state=1)
+    X = X.T
+    classification(X, Y, 30000)
 
 
 if __name__ == "__main__":

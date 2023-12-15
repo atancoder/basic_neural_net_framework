@@ -11,7 +11,7 @@ def predict_with_threshold(probabilities, threshold=0.5):
     return (probabilities > threshold).astype(int)
 
 
-def relu_neural_net(training_data, training_labels):
+def neural_net(training_data, training_labels, iterations=100):
     training_data = training_data.reshape(-1, 2)
     training_labels = training_labels.reshape(-1, 1)
 
@@ -32,14 +32,14 @@ def relu_neural_net(training_data, training_labels):
             #     activation="relu",
             #     kernel_regularizer=tf.keras.regularizers.l2(1e-10),
             # ),
-            tf.keras.layers.Dense(units=1, activation="sigmoid"),
+            tf.keras.layers.Dense(units=1, activation="sigmoid", input_shape=(2,))
         ]
     )
     model.compile(
         loss=BinaryCrossentropy(from_logits=False),
         optimizer=Adam(learning_rate=0.01),
     )
-    model.fit(training_data, training_labels, epochs=100)
+    model.fit(training_data, training_labels, epochs=iterations)
     probabilities = model.predict(training_data)
     num_correct = (training_labels == predict_with_threshold(probabilities)).sum()
     print(f"Accuracy: {num_correct / training_data.shape[0]}")

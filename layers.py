@@ -60,8 +60,8 @@ class Layer:
         self.is_last_layer = False
 
     def compile(self, input_size, id, next_layer):
-        self._init_params(input_size)
         self.id = id  # 1st hidden layer is layer id 1
+        self._init_params(input_size)
         self.next_layer = next_layer
         if next_layer is None:
             self.is_last_layer = True
@@ -107,7 +107,6 @@ class Layer:
         dX_dZ = self._dX_dZ(X_out)
         dZ_dW = self._dZ_dW(X_in)
         matrix_mult = next_layer_dloss_dinput * dX_dZ
-
         return np.dot(matrix_mult, dZ_dW)
 
     def dloss_db(self, next_layer_dloss_dinput, X_out, Z_out, X_in):
@@ -121,9 +120,8 @@ class Layer:
         dX_dZ = self._dX_dZ(X_out)
         dZ_dB = self._dZ_dB(Z_out)
         dloss_dB = next_layer_dloss_dinput * dX_dZ * dZ_dB
-
-        # Convert to b.shape by taking average across samples (along the column)
-        return np.mean(dloss_dB, axis=1).reshape(self.b.shape)
+        # Convert to b.shape by taking sum across samples (along the column)
+        return np.sum(dloss_dB, axis=1).reshape(self.b.shape)
 
     def _dX_dZ(self, X_out):
         """
@@ -135,7 +133,7 @@ class Layer:
         Returns X_out shape
         """
         if self.is_last_layer and self.activation_fn == sigmoid:
-            return np.ones(X_out.shape)
+            return 1
 
         return ACTIVATION_FN_PRIME[self.activation_fn](X_out)
 
@@ -154,7 +152,7 @@ class Layer:
 
         Return value shape = Z_out shape
         """
-        return np.ones(Z_out.shape)
+        return 1
 
     def dloss_dinput(self, next_layer_dloss_dinput, X_out) -> float:
         """
@@ -182,8 +180,8 @@ class Layer:
         weight_vectors = []
         bias_terms = []
         for _ in range(self.units):
-            weight_vectors.append(np.random.rand(self.input_size))
-            bias_terms.append(random.random())
+            weight_vectors.append(np.random.randn(self.input_size))
+            bias_terms.append(float(0))
         weight_vectors = np.array(weight_vectors)
         bias_terms = np.array(bias_terms)
         self.W = weight_vectors

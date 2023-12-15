@@ -29,6 +29,7 @@ class ANN:
                 dims[i - 1]
             )
             self.params[f"b{i}"] = np.zeros((dims[i], 1))
+        print(f"Initial weights: {self.params}")
 
     def forward(self, X, Y=None):
         """
@@ -109,9 +110,9 @@ class ANN:
 X, Y = make_moons(n_samples=30, noise=0.3, random_state=1)
 X = X.T
 
-dims = [2, 1]
+dims = [2, 16, 8, 4, 2, 1]
 nn = ANN(dims, lambd=0)
-for epoch in range(30000 + 1):
+for epoch in range(10000 + 1):
     nn.forward(X, Y)
     nn.backward()
     nn.update(0.005)

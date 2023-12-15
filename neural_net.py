@@ -17,7 +17,7 @@ class NeuralNetwork:
         loss_cls: Loss,
         learning_rate: float = 1,
         dynamic_lr=True,
-        min_lr=1e-7,
+        min_lr=1e-10,
         lr_epsilon=1e-2,
     ) -> None:
         self.layers = layers
@@ -63,8 +63,10 @@ class NeuralNetwork:
 
     def adjust_learning_rate(self, new_loss):
         if new_loss > self.curr_loss:
-            self.learning_rate = max(self.learning_rate / 2, self.min_lr)
-            print(f"Reduced learning rate to {self.learning_rate}")
+            new_lr = max(self.learning_rate / 2, self.min_lr)
+            if new_lr != self.learning_rate:
+                self.learning_rate = new_lr
+                print(f"Reduced learning rate to {self.learning_rate}")
             return
 
         # pct_improvement = (self.curr_loss - new_loss) / self.curr_loss
@@ -73,14 +75,13 @@ class NeuralNetwork:
         #     print(f"Increased learning rate to {self.learning_rate}")
         #     return
 
-    def train(self, X, Y, iterations=1000):
-        np.set_printoptions(threshold=10)
-        for i in range(iterations):
+    def train(self, X, Y, iterations):
+        for i in range(iterations + 1):
             Y_hat = self.predict(X)
             new_loss = self.compute_loss(Y_hat, Y)
             if self.dynamic_lr:
                 self.adjust_learning_rate(new_loss)
-            if i % 100 == 1:
+            if i % 3000 == 0:
                 print(f"Loss at iteration {i}: {new_loss}")
 
             self.apply_backprop(Y_hat, Y)
