@@ -72,8 +72,6 @@ def classification():
     X, Y = generate_train_data_classification(samples=10000)
     # layers = [Layer(3, "relu"), Layer(2, "relu"), Layer(1, "sigmoid")]
     # layers = [Layer(2, "relu"), Layer(1, "sigmoid")]
-    X, Y = make_moons(n_samples=30, noise=0.3, random_state=1)
-    X = X.T
     layers = [Layer(1, "sigmoid")]
     nn = NeuralNetwork(
         2,
@@ -87,7 +85,7 @@ def classification():
     loss = nn.compute_loss(Y_hat, Y)
     print(f"Loss before training: {loss}")
 
-    nn.train(X, Y, iterations=30000)
+    nn.train(X, Y, iterations=1000)
     nn.print_weights()
     nn.score(X, Y)
     Y_hat = nn.predict(X)

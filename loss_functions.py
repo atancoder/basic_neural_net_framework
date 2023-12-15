@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
+from tensorflow.keras.losses import BinaryCrossentropy  # type: ignore
 
 
 def safe_Y_hat(Y_hat, epsilon=1e-15):
@@ -43,10 +44,11 @@ class Loss(ABC):
 
 class BinaryCrossEntropyLoss(Loss):
     def _loss(self, Y_hat, Y) -> float:
-        # Y_hat are the predictions
-        Y_hat = safe_Y_hat(Y_hat)
-        loss = -1 * (Y * np.log(Y_hat) + (1 - Y) * np.log(1 - Y_hat))
-        return np.mean(loss)
+        return BinaryCrossentropy(from_logits=False)(Y, Y_hat).numpy()
+        # # Y_hat are the predictions
+        # Y_hat = safe_Y_hat(Y_hat)
+        # loss = -1 * (Y * np.log(Y_hat) + (1 - Y) * np.log(1 - Y_hat))
+        # return np.mean(loss)
 
     def _dloss_dy_hat(self, Y_hat, Y) -> np.array:
         n = Y_hat.shape[1]

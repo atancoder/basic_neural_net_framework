@@ -7,8 +7,7 @@ from tensorflow.keras.losses import BinaryCrossentropy  # type: ignore
 from tensorflow.keras.optimizers.legacy import Adam  # type: ignore
 
 
-def predict_with_threshold(model, input_data, threshold=0.5):
-    probabilities = tf.nn.sigmoid(model.predict(input_data)).numpy()
+def predict_with_threshold(probabilities, threshold=0.5):
     return (probabilities > threshold).astype(int)
 
 
@@ -37,13 +36,12 @@ def relu_neural_net(training_data, training_labels):
         ]
     )
     model.compile(
-        loss=BinaryCrossentropy(from_logits=True),
+        loss=BinaryCrossentropy(from_logits=False),
         optimizer=Adam(learning_rate=0.01),
     )
-
     model.fit(training_data, training_labels, epochs=100)
-    predictions = predict_with_threshold(model, training_data)
-    num_correct = (predictions == predictions).sum()
+    Y_hat = model.predict(training_data)
+    num_correct = (training_labels == predict_with_threshold(Y_hat)).sum()
     print(f"Accuracy: {num_correct / training_data.shape[0]}")
     print_weights(model)
 
