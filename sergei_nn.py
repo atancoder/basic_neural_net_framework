@@ -121,3 +121,4 @@ for epoch in range(30000 + 1):
 Y_hat = nn.predict(X)
 num_correct = (Y == Y_hat).sum()
 print(f"Accuracy: {num_correct / Y.shape[0]}")
+print(f"Weights: {nn.params}")
