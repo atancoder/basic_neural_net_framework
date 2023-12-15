@@ -20,19 +20,33 @@ def relu_prime(x):
     return np.where(x > 0, 1, 0)
 
 
-ACTIVATION_FN_PRIME = {relu: relu_prime, sigmoid: sigmoid_prime}
+def linear(x):
+    return x
+
+
+def linear_prime(x):
+    return np.ones(x.shape)
+
+
+ACTIVATION_FN_PRIME = {relu: relu_prime, sigmoid: sigmoid_prime, linear: linear_prime}
 
 
 class Layer:
     def __init__(
-        self, units: int, activation_fn: str, learning_rate: float = 0.1
+        self,
+        units: int,
+        activation_fn: str,
     ) -> None:
+        """
+        Learning rate is dynamic as we change it based on how the loss changes
+        """
         self.units = units
-        self.learning_rate = learning_rate
         if activation_fn == "relu":
             self.activation_fn = relu
         elif activation_fn == "sigmoid":
             self.activation_fn = sigmoid
+        elif activation_fn == "linear":
+            self.activation_fn = linear
         else:
             raise Exception(f"{activation_fn} activation fn not supported")
         self._is_compiled = False
@@ -43,11 +57,14 @@ class Layer:
         self.b = None  # shape = (# of units, 1)
         self.id = None
         self.next_layer = None
+        self.is_last_layer = False
 
     def compile(self, input_size, id, next_layer):
         self._init_params(input_size)
         self.id = id  # 1st hidden layer is layer id 1
         self.next_layer = next_layer
+        if next_layer is None:
+            self.is_last_layer = True
         self._is_compiled = True
 
     def apply_activation(self, x):
@@ -79,15 +96,7 @@ class Layer:
             return output, WX_b
         return output
 
-    def update_params(self, next_layer_dloss_dinput, X_out, Z_out, X_in):
-        self.W -= self.learning_rate * self._dloss_dW(
-            next_layer_dloss_dinput, X_out, Z_out, X_in
-        )
-        self.b -= self.learning_rate * self._dloss_db(
-            next_layer_dloss_dinput, X_out, Z_out, X_in
-        )
-
-    def _dloss_dW(self, next_layer_dloss_dinput, X_out, Z_out, X_in):
+    def dloss_dW(self, next_layer_dloss_dinput, X_out, Z_out, X_in):
         """
         next_layer_dloss_dinput shape = (# of units, # of samples)
         _dX_dZ shape = (# of units, # of samples)
@@ -98,9 +107,10 @@ class Layer:
         dX_dZ = self._dX_dZ(X_out)
         dZ_dW = self._dZ_dW(X_in)
         matrix_mult = next_layer_dloss_dinput * dX_dZ
+
         return np.dot(matrix_mult, dZ_dW)
 
-    def _dloss_db(self, next_layer_dloss_dinput, X_out, Z_out, X_in):
+    def dloss_db(self, next_layer_dloss_dinput, X_out, Z_out, X_in):
         """
         next_layer_dloss_dinput shape = (# of units, # of samples)
         _dX_dZ shape = (# of units, # of samples)
@@ -115,14 +125,21 @@ class Layer:
         # Convert to b.shape by taking average across samples (along the column)
         return np.mean(dloss_dB, axis=1).reshape(self.b.shape)
 
-    def _dX_dZ(self, X_out) -> List:
+    def _dX_dZ(self, X_out):
         """
+        SPECIAL EXCEPTION: For log loss and the last layer
+        - don't multiply by dX_dZ since we already factored it out
+            in the gradient of the log loss! No-op instead
+
         X_out shape = (# of units, # of samples)
         Returns X_out shape
         """
+        if self.is_last_layer and self.activation_fn == sigmoid:
+            return np.ones(X_out.shape)
+
         return ACTIVATION_FN_PRIME[self.activation_fn](X_out)
 
-    def _dZ_dW(self, X_in) -> List:
+    def _dZ_dW(self, X_in):
         """
         X_in shape = (# of prev_layer units, # of samples)
 
