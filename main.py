@@ -6,7 +6,8 @@ from sklearn.datasets import make_moons
 from layers import Layer
 from loss_functions import MSE, BinaryCrossEntropyLoss
 from neural_net import NeuralNetwork
-from tensor_flow import neural_net
+from py_torch import neural_net as pt_neural_net
+from tensor_flow import neural_net as tf_neural_net
 
 np.set_printoptions(threshold=10)
 
@@ -19,14 +20,14 @@ def generate_train_data_classification(samples=10000):
     data = []
     labels = []
     for _ in range(samples):
-        x = random.uniform(0, 100)
-        y = random.uniform(0, 100)
-        data.append((x, y))
-        if in_range(x, y):
+        x1 = random.uniform(0, 100)
+        x2 = random.uniform(0, 100)
+        data.append((x1, x2))
+        if in_range(x1, x2):
             labels.append(1)
         else:
             labels.append(0)
-    return np.array(data).T, np.array(labels).reshape(1, -1)
+    return np.array(data), np.array(labels).reshape(-1, 1)
 
 
 def generate_train_data_regression(samples=10000):
@@ -37,7 +38,7 @@ def generate_train_data_regression(samples=10000):
         x2 = random.uniform(0, 100)
         data.append((x1, x2))
         labels.append(3 * x1 - 4 * x2)
-    return np.array(data).T, np.array(labels).reshape(1, -1)
+    return np.array(data), np.array(labels)
 
 
 def regression():
@@ -65,11 +66,17 @@ def regression():
     print(f"Loss after training: {loss}")
 
 
-def tensor_flow(X, Y, iterations=1000):
-    neural_net(X, Y, iterations)
+def tensor_flow(X, Y, iterations):
+    tf_neural_net(X, Y, iterations)
 
 
-def classification(X, Y, iterations=1000):
+def py_torch(X, Y, iterations):
+    pt_neural_net(X, Y, iterations)
+
+
+def classification(X, Y, iterations):
+    X = X.T
+    Y = Y.reshape(1, -1)
     layers = [
         Layer(16, "relu"),
         Layer(8, "relu"),
@@ -81,8 +88,8 @@ def classification(X, Y, iterations=1000):
         2,
         layers,
         loss_cls=BinaryCrossEntropyLoss(C=0.01, regularization=False),
-        learning_rate=0.005,
-        dynamic_lr=False,
+        learning_rate=0.1,
+        dynamic_lr=True,
     )
     nn.score(X, Y)
     Y_hat = nn.predict(X)
@@ -90,7 +97,7 @@ def classification(X, Y, iterations=1000):
     print(f"Loss before training: {loss}")
 
     nn.train(X, Y, iterations)
-    nn.print_weights()
+    # nn.print_weights()
     nn.score(X, Y)
     Y_hat = nn.predict(X)
     loss = nn.compute_loss(Y_hat, Y)
@@ -99,9 +106,7 @@ def classification(X, Y, iterations=1000):
 
 def main():
     X, Y = generate_train_data_classification(samples=10000)
-    X, Y = make_moons(n_samples=30, noise=0.3, random_state=1)
-    X = X.T
-    classification(X, Y, 30000)
+    py_torch(X, Y, 10)
 
 
 if __name__ == "__main__":

@@ -81,7 +81,7 @@ class NeuralNetwork:
             new_loss = self.compute_loss(Y_hat, Y)
             if self.dynamic_lr:
                 self.adjust_learning_rate(new_loss)
-            if i % 3000 == 0:
+            if i % 100 == 0:
                 print(f"Loss at iteration {i}: {new_loss}")
 
             self.apply_backprop(Y_hat, Y)

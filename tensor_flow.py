@@ -17,22 +17,27 @@ def neural_net(training_data, training_labels, iterations=100):
 
     model = tf.keras.Sequential(
         [
-            # tf.keras.layers.Dense(
-            #     units=120,
-            #     activation="relu",
-            #     kernel_regularizer=tf.keras.regularizers.l2(1e-10),
-            # ),
-            # tf.keras.layers.Dense(
-            #     units=40,
-            #     activation="sigmoid",
-            #     kernel_regularizer=tf.keras.regularizers.l2(1e-10),
-            # ),
-            # tf.keras.layers.Dense(
-            #     units=20,
-            #     activation="relu",
-            #     kernel_regularizer=tf.keras.regularizers.l2(1e-10),
-            # ),
-            tf.keras.layers.Dense(units=1, activation="sigmoid", input_shape=(2,))
+            tf.keras.layers.Dense(
+                units=16,
+                activation="relu",
+                kernel_regularizer=tf.keras.regularizers.l2(1e-10),
+            ),
+            tf.keras.layers.Dense(
+                units=8,
+                activation="relu",
+                kernel_regularizer=tf.keras.regularizers.l2(1e-10),
+            ),
+            tf.keras.layers.Dense(
+                units=4,
+                activation="relu",
+                kernel_regularizer=tf.keras.regularizers.l2(1e-10),
+            ),
+            tf.keras.layers.Dense(
+                units=2,
+                activation="relu",
+                kernel_regularizer=tf.keras.regularizers.l2(1e-10),
+            ),
+            tf.keras.layers.Dense(units=1, activation="sigmoid"),
         ]
     )
     model.compile(
@@ -43,7 +48,6 @@ def neural_net(training_data, training_labels, iterations=100):
     probabilities = model.predict(training_data)
     num_correct = (training_labels == predict_with_threshold(probabilities)).sum()
     print(f"Accuracy: {num_correct / training_data.shape[0]}")
-    print_weights(model)
 
 
 def print_weights(model):
