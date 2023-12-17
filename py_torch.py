@@ -4,6 +4,10 @@ from torch.utils.data import DataLoader, TensorDataset
 
 DEVICE = "cpu"
 BATCH_SIZE = 64
+import numpy as np
+
+# seed 7 leads to dead neurons
+torch.manual_seed(6)
 
 
 class NeuralNetwork(nn.Module):
@@ -19,11 +23,14 @@ class NeuralNetwork(nn.Module):
             nn.Linear(4, 2),
             nn.ReLU(),
             nn.Linear(2, 1),
-            nn.Sigmoid(),
         )
 
     def forward(self, x):
-        return self.linear_relu_stack(x)
+        self.intermediate_outputs = []  # Reset the list for each forward pass
+        for layer in self.linear_relu_stack:
+            x = layer(x)
+            self.intermediate_outputs.append(x.clone())
+        return x
 
 
 def neural_net(X, Y, iterations):
@@ -40,14 +47,15 @@ def neural_net(X, Y, iterations):
 def test(model, X, Y):
     model.eval()
     with torch.no_grad():
-        outputs = model(X)
-        predicted_labels = (outputs >= 0.5).float()
+        logits = model(X)
+        probabilities = torch.sigmoid(logits)
+        predicted_labels = (probabilities >= 0.5).float()
         accuracy = (predicted_labels == Y.view(-1, 1)).sum().item() / len(Y)
         print(f"Accuracy: {accuracy * 100:.2f}%")
 
 
 def train(model, data_loader, iterations):
-    loss_fn = nn.BCELoss()
+    loss_fn = nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
     model.train()  # Sets the model into training mode
     for iteration in range(iterations):

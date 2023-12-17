@@ -2,6 +2,7 @@ import random
 
 import numpy as np
 from sklearn.datasets import make_moons
+from sklearn.preprocessing import StandardScaler
 
 from layers import Layer
 from loss_functions import MSE, BinaryCrossEntropyLoss
@@ -104,9 +105,15 @@ def classification(X, Y, iterations):
     print(f"Loss after training: {loss}")
 
 
+def normalize(X):
+    scaler = StandardScaler()
+    return scaler.fit_transform(X)
+
+
 def main():
     X, Y = generate_train_data_classification(samples=10000)
-    py_torch(X, Y, 10)
+    X = normalize(X)
+    classification(X, Y, 1000)
 
 
 if __name__ == "__main__":

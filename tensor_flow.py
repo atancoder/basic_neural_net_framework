@@ -1,5 +1,3 @@
-from functools import partial
-
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
@@ -12,9 +10,6 @@ def predict_with_threshold(probabilities, threshold=0.5):
 
 
 def neural_net(training_data, training_labels, iterations=100):
-    training_data = training_data.reshape(-1, 2)
-    training_labels = training_labels.reshape(-1, 1)
-
     model = tf.keras.Sequential(
         [
             tf.keras.layers.Dense(
@@ -37,17 +32,17 @@ def neural_net(training_data, training_labels, iterations=100):
                 activation="relu",
                 kernel_regularizer=tf.keras.regularizers.l2(1e-10),
             ),
-            tf.keras.layers.Dense(units=1, activation="sigmoid"),
+            tf.keras.layers.Dense(units=1, activation="linear"),
         ]
     )
     model.compile(
-        loss=BinaryCrossentropy(from_logits=False),
+        loss=BinaryCrossentropy(from_logits=True),
         optimizer=Adam(learning_rate=0.01),
     )
     model.fit(training_data, training_labels, epochs=iterations)
     probabilities = model.predict(training_data)
     num_correct = (training_labels == predict_with_threshold(probabilities)).sum()
-    print(f"Accuracy: {num_correct / training_data.shape[0]}")
+    print(f"Accuracy: {num_correct * 100 / training_data.shape[0]} %")
 
 
 def print_weights(model):
