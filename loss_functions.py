@@ -9,7 +9,7 @@ def safe_Y_hat(Y_hat, epsilon=1e-15):
 
 
 class Loss(ABC):
-    def __init__(self, C=0.1, regularization=True) -> None:
+    def __init__(self, C=0.1, regularization=False) -> None:
         self.C = C
         self.regularization = regularization
 

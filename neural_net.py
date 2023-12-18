@@ -140,5 +140,4 @@ class NeuralNetwork:
 
     def compute_loss(self, Y_hat, Y) -> float:
         # Y_hat are the predictions
-        # We only support Log Loss (BinaryCrossEntropy Loss)
         return self.loss_cls.loss(Y_hat, Y, self.get_all_params())

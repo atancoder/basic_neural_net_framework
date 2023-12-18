@@ -10,8 +10,6 @@ from neural_net import NeuralNetwork
 from py_torch import neural_net as pt_neural_net
 from tensor_flow import neural_net as tf_neural_net
 
-np.set_printoptions(threshold=10)
-
 
 def in_range(x, y) -> bool:
     return y < 0.3 * x + 2
@@ -42,9 +40,9 @@ def generate_train_data_regression(samples=10000):
     return np.array(data), np.array(labels)
 
 
-def regression():
-    X, Y = generate_train_data_regression(samples=1000)
-    X_test, Y_test = generate_train_data_regression(samples=100)
+def regression(X, Y, iterations):
+    X = X.T
+    Y = Y.reshape(1, -1)
     # layers = [Layer(3, "relu"), Layer(2, "relu"), Layer(1, "sigmoid")]
     # layers = [[Layer(2, "relu"),] Layer(1, "sigmoid")]
     layers = [Layer(1, "linear")]
@@ -56,14 +54,14 @@ def regression():
         min_lr=1e-15,
     )
 
-    Y_hat = nn.predict(X_test)
-    loss = nn.compute_loss(Y_hat, Y_test)
+    Y_hat = nn.predict(X)
+    loss = nn.compute_loss(Y_hat, Y)
     print(f"Loss before training: {loss}")
 
-    nn.train(X, Y)
+    nn.train(X, Y, iterations)
     nn.print_weights()
-    Y_hat = nn.predict(X_test)
-    loss = nn.compute_loss(Y_hat, Y_test)
+    Y_hat = nn.predict(X)
+    loss = nn.compute_loss(Y_hat, Y)
     print(f"Loss after training: {loss}")
 
 
@@ -88,7 +86,7 @@ def classification(X, Y, iterations):
     nn = NeuralNetwork(
         2,
         layers,
-        loss_cls=BinaryCrossEntropyLoss(C=0.01, regularization=False),
+        loss_cls=BinaryCrossEntropyLoss(),
         learning_rate=0.1,
         dynamic_lr=True,
     )
@@ -111,9 +109,9 @@ def normalize(X):
 
 
 def main():
-    X, Y = generate_train_data_classification(samples=10000)
+    X, Y = generate_train_data_regression(samples=10000)
     X = normalize(X)
-    classification(X, Y, 1000)
+    regression(X, Y, 1000)
 
 
 if __name__ == "__main__":
