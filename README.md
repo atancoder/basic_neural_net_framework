@@ -4,3 +4,6 @@ Built my own deep learning framework (e.g Tensorflow/PyTorch) to help me learn t
 
 Implemented backprop and calculated gradients by myself. Results are comparable to using pytorch and 
 tensorflow after training.
+
+Bonus
+- implemented dynamic learning rate adjustment
