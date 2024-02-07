@@ -1,4 +1,4 @@
-# Deep Learning
+# Coding Up Backprop in My Deep Learning Framework
 
 Built my own deep learning framework (e.g Tensorflow/PyTorch) to help me learn the basics better. 
 
