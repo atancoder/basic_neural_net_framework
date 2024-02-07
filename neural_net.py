@@ -121,7 +121,7 @@ class NeuralNetwork:
 
     def normalize_based_on_step_size(self, dparam, step_loss_size):
         """
-        The idea here is that we know how far away we to hit a loss of 0
+        The idea here is that we know how far away we are to hit a loss of 0
         We know how much loss we can reduce by moving 1 step in y_hat
         So to make sure we don't overshoot, we can approximate the amount
         of steps to ensure we don't overshoot the loss
